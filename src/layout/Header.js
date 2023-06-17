@@ -6,8 +6,10 @@ const Header = () => {
     <header>
       <div className="container">
         <div className="left">
-          <BsList className="icon" />
-          <img src="logo2.png" alt="logo" />
+          <BsList className="iconList" />
+          <a href="/">
+            <img src="logo2.png" alt="logo" />
+          </a>
         </div>
         <div className="right">
           <a href="/">

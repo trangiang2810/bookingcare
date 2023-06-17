@@ -10,6 +10,7 @@ const Home = () => {
   const [startIndex, setStartIndex] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [isError, setIsError] = useState(false);
   const containerRef = useRef(null);
   const blurTimeoutRef = useRef(null);
 
@@ -17,6 +18,7 @@ const Home = () => {
     if (searchTerm.trim() !== "") {
       setStartIndex(1);
       setSearchResults([]);
+      setIsError(false);
       fetchSearchResults();
     }
   }, [searchTerm]);
@@ -49,7 +51,7 @@ const Home = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `https://www.googleapis.com/customsearch/v1?key=AIzaSyC6v-aqWiqEJIs8Nv3vsNVIi804hSdXUKo&cx=12526291779674938&cx=12526291779674938&q=${searchTerm}&start=${startIndex}`
+        `https://www.googleapis.com/customsearch/v1?key=AIzaSyA6B7dmBxibNzgfNcO7Qumb8KrzcEH9O5U&cx=12526291779674938&cx=12526291779674938&q=${searchTerm}&start=${startIndex}`
       );
 
       const data = response.data;
@@ -58,6 +60,11 @@ const Home = () => {
       setIsLoading(false);
     } catch (error) {
       console.error(error);
+      if (error.response?.status === 429) {
+        setIsError(true);
+      } else {
+        setIsError(false);
+      }
       setIsLoading(false);
     }
   };
@@ -82,8 +89,7 @@ const Home = () => {
   const handleClickResult = () => {
     clearTimeout(blurTimeoutRef.current);
   };
-  console.log(searchResults);
-  console.log(startIndex);
+
   return (
     <div className="container">
       <div className="form">
@@ -91,7 +97,7 @@ const Home = () => {
           <h1>Tìm kiếm</h1>
         </div>
         <div className="searchInput">
-          <BiSearch />
+          <BiSearch className="iconSearch" />
           <input
             onBlur={handleBlur}
             onFocus={handleFocus}
@@ -123,9 +129,16 @@ const Home = () => {
               </a>
             </li>
           ))}
+
           <div ref={containerRef} className="intersectionObserver" />
         </ul>
         {isLoading && <BiLoaderAlt className="loading" />}
+        {isError && (
+          <p className="errorMessage">
+            Hiện đang vượt quá giới hạn cho phép của Google Custom Search API.
+            Vui lòng đợi trước khi thực hiện tìm kiếm bổ sung.
+          </p>
+        )}
       </div>
     </div>
   );
